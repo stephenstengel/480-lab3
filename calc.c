@@ -1,8 +1,8 @@
 /*
  * Stephen Stengel <stephen.stengel@cwu.edu> 40819903
  * 
+ * Rudimentary Calculator.
  */
-
 
 #include <stdio.h>
 #include <string.h>
@@ -12,37 +12,21 @@
 
 #include "calc.h"
 
-
-//Things to remember
-//	Munch beginning spaces and tabs. pg 78. while loop getch;
-//	https://stackoverflow.com/questions/16870485/how-can-i-read-an-input-string-of-unknown-length
-//		This showed me that scanf can dynamically allocate memory now!
-//		!!!!!!!!!!Be sure to free it!!!!!!!!!!!!!
-//	Need to erase all whitespace characters in the input, before, during, and after the expression
-
-//Use pointer to keep track of which character to be currently considering.
-//		This way you son't need to store or manipulate a buffer. Just move a
-//		pointer back over the string
-//Or I can use the ungetch() method from the book. That will more closely
-//	follow the c++ version.
-
-
+//Main function!
 int main(int argc, char **argv)
 {
 	helpCheckPrint(argc, argv);
-	printf("Yeah, heres my calculator!\n");
+	printf("\nHello, this is my calculator!\n\n");
 
-	//~ int calcFlag = calculator();
-	
 	calculator();
-
-	//~ printf("The status code of calculate was: %d: \n", calcFlag);
 	
+	printf("\nGoodbye!\n\n");
+
 	return 0;
 }
 
 
-//Checks if a help message is needed and prints it if so.
+//Checks the command line flags for a help request. Prints one if needed.
 int helpCheckPrint(int argc, char** argv)
 {
 	if (argc > 1 && (!strcmp(argv[1], "help")
@@ -72,6 +56,7 @@ int helpCheckPrint(int argc, char** argv)
 }
 
 
+//Calls the calculator logic.
 int calculator()
 {
 	char iWillContinue = 'y';
@@ -81,48 +66,41 @@ int calculator()
 		
 		char* workingArray = NULL; //for holding the input string.
 		
-		printf("Enter a string!:\n > ");
-		//~ scanf("%m[^\n]s", &workingArray); 	//The m specifies that scanf will automatically allocate memory
-											//~ //The [^\n] makes it keep going until a newline is entered.
-											//~ //The m makes a call to malloc, so workingArray is local
+		printf("Enter an arithmetic string to calculate!:\n > ");
 											
-		scanf("%ms", &workingArray); //this version cannot handle whitespace!
-		if ( workingArray == NULL)
-		{
-			printf("THE ARRAY IS STILL NULL FOR SOME REASON!\n");
+		scanf("%ms", &workingArray); //The m specifies that scanf will 
+		if ( workingArray == NULL)   //automatically allocate memory with
+		{                            //with malloc
+			printf("THE ARRAY IS STILL NULL FOR SOME REASON! LOL\n");
 			exit(1);
 		}
 		else
 		{
-			printf("This is the value of workingArray: %s\n", workingArray);////
 			//Perform calculation!
 			
 			currentCharPointer = workingArray;
-			printf("This is the value of charptr: %c\n", *currentCharPointer);////
-			printf("This is the value of charptr+1: %c\n", *(currentCharPointer+1)  );////
 			
-			double answer = plusMinus(workingArray);///////////////////////////////////////////////////PLUSMINUS
+			double answer = plusMinus(workingArray);
 			printf("= %f\n", answer);
 			
-			printf("freeing the workingArray memory.\n");
 			free(workingArray); //! Don't forget this, lol
 		}
 		
 		isBufferToken = FALSE;
-		
 		iWillContinue = askIfContinue(iWillContinue);
-		
 		printf("\n");
 	}
 										
 	return 0;
 }
 
+
+//Asks the user if they want to do another calculation. Single character input.
 char askIfContinue(char myChar)
 {
 	printf("Enter y to go again! Press any other letter to exit.");
 	int c;
-	while ( (c = getchar()) != '\n'){}; //munch characters.
+	while ( (c = getchar()) != '\n'){}; //munch characters in stdin.
 	
 	system("stty raw"); //switches to get single character mode
 	myChar = getchar();
@@ -132,18 +110,13 @@ char askIfContinue(char myChar)
 }
 
 
-//expression in the book  /////////////////////////////////////////////////working here.
+//The basic function of the calculator. Adds the results of the multiplication
+//and division function, multiplyDivide().
 double plusMinus()
 {
-	printf("Calling plusminus\n");
-	double leftVal = multiplyDivide(); //may need to pass values or make a global var.
+	double leftVal = multiplyDivide();
 	
-	//get a token. Will need to have pointer to current char in workArray
 	struct Token myToken = getNextToken();
-	printf("Value of the returned token:\n");
-	printf("dataType: %c\nValue: %f\n", myToken.dataType, myToken.value);
-	
-	//~ printf("Value returned from getNextChar: %c\n", getNextChar().);
 	
 	while ( TRUE )
 	{
@@ -162,35 +135,25 @@ double plusMinus()
 				return leftVal;
 		}
 	}
-	
-	
-	//~ return ;
 }
 
 
+//Performs multiplication, exponentiation, and division on the results of the
+//numbersAndParentheses() function.
 double multiplyDivide()
 {
-	printf("Calling multiplyDivide\n");
-	double leftVal = numbersAndParentheses(); //may need to pass values or make a global var.
-	printf("Back in multiplyDivide\n");
+	double leftVal = numbersAndParentheses();
 	
-	printf("*currentCharPointer: %c\n", *currentCharPointer);
-	//~ if ( *currentCharPointer == ';' )
-	//~ {
-		//~ return leftVal;
-	//~ }
-	
-	//get a token. Will need to have pointer to current char in workArray
 	struct Token myToken = getNextToken();
-	printf("Value of the returned token:\n");
-	printf("dataType: %c\nValue: %f\n", myToken.dataType, myToken.value);
-	
-	//~ printf("Value returned from getNextChar: %c\n", getNextChar().);
 	
 	while ( TRUE )
 	{
 		switch( myToken.dataType )
 		{
+			case '^':
+				leftVal = pow(leftVal, numbersAndParentheses() );
+				myToken = getNextToken();
+				break;
 			case '*':
 				leftVal *= numbersAndParentheses();
 				myToken = getNextToken();
@@ -201,38 +164,24 @@ double multiplyDivide()
 				if (tempDouble == 0)
 				{
 					printf("DIVIDE BY ZERO ERROR LOL!\n");
-					exit(3);
+					exit(2);
 				}
 				leftVal /= tempDouble;
 				myToken = getNextToken();
 				break;
 			}
-			case '^':
-				leftVal = pow(leftVal, numbersAndParentheses() );
-				myToken = getNextToken();
-				break;
 			default:
 				goBackOneChar(myToken);
 				return leftVal;
 		}
 	}
-	
-	
-	
-	
-	return 1.2222;
 }
 
 
-
-
+//Finds numbers and returns them. Finds Parentheses, +, -, and returns them.
 double numbersAndParentheses()
 {
-	printf("Calling numbersandparentheses\n");
-
 	struct Token myToken = getNextToken();
-	printf("Back in numbersandparentheses\n");
-	
 	
 	switch(myToken.dataType)
 	{
@@ -244,21 +193,24 @@ double numbersAndParentheses()
 			{
 				printf("ERROR! Expected a ending parentheses ')' character"
 						" but it wasn't there!\n");
-				exit(4);
+				exit(3);
 			}
+			
 			return tempDouble;
 		}
-		case 'n': //n is the character I'm using to represent number tokens
-			printf("Returning from numbersandparentheses this value: %f\n", myToken.value);
+		case 'n':      //n is the character I'm using to represent number tokens
 			return myToken.value;
+			
 		case '-':
 			return -numbersAndParentheses(); //handling negatives.
+			
 		case '+':
-			return numbersAndParentheses();
+			return numbersAndParentheses();  //Handling explicit positives.
+			
 		default:
 			printf("ERROR! Was expecting a '(' or a number but it was"
 					" something else!\n");
-			exit(5);
+			exit(4);
 	}
 }
 
@@ -266,20 +218,13 @@ double numbersAndParentheses()
 //Returns the next char to consider. Advances the currentCharPointer by 1.
 struct Token getNextToken()
 {
-	printf("Calling getNextToken\n");
-
 	//if there is a buffer Token, draw from it instead.
-	
-	printf("isBufferToken: %d\n", isBufferToken);
-	printf("bufferToken.dataType: %c\n", bufferToken.dataType);
-	printf("bufferToken.value: %f\n", bufferToken.value);
 	if ( isBufferToken )
 	{
-		printf("There is a buffer token. Returning it.\n");
-		
 		isBufferToken = FALSE;
 		return bufferToken;
 	}
+	
 	char c;
 	c = getNextChar();
 	
@@ -295,7 +240,8 @@ struct Token getNextToken()
 		case '^':
 		{
 			struct Token aToken;
-			aToken.dataType = c;				
+			aToken.dataType = c;
+							
 			return aToken; //make a token out of this character.
 		}
 		case '.':  
@@ -310,105 +256,78 @@ struct Token getNextToken()
 		case '8':
 		case '9':
 		{
-			//~ goBackOneChar(); //Here, I need to reverse the digit in consideration by 1
 			rollBackCharacterPointerOnly();
 			double valTemp;
 			
 			//get the number including decimal as a string
+			//! ! ! This is a very messy hack. Will make pretty later. ! ! !//
 			int currentStringSize = 100;
 			char* tempString = (char*)malloc(currentStringSize + 1);
 			char tmpC;
 			while ( isdigit( tmpC = getNextChar() ) || tmpC == '.' )
 			{
-				printf("While called!\n");
 				if( strlen(tempString) + 10 > currentStringSize )
 				{
-					printf("realloc called lol\n");
 					tempString = (char *)realloc(tempString, currentStringSize*2 + 2);
 				}
 				
-				//~ strcat(tempString, (char)tmpC );
 				int tmpLen = strlen(tempString);
-				printf("tmpLen: %d\n", tmpLen);//////////////////strLen is zero if input is "1;"
-				tempString[ tmpLen ] = tmpC;
+				tempString[ tmpLen ] = tmpC;     //Appends a char to the string.
 				tempString[ tmpLen + 1] = '\0';
-				
-				printf("tempString length: %d\n", (int)strlen(tempString) );
-				printf("Contents of tempString: %s\n", tempString);
-				
 			}
-			printf("currentCharPointer just after while: %c\n", *currentCharPointer);
-			
-			//~ goBackOneChar();//not sure if need go back just char or also token.
 			rollBackCharacterPointerOnly();
-			printf("currentCharPointer just after goBack: %c\n", *currentCharPointer);
-			
 			
 			//convert that string to a double!
 			valTemp = atof( tempString );
-			printf("value of valTemp: %f\n", valTemp);
 			
 			struct Token retToken;
 			retToken.dataType = 'n'; //Using 'n' for number!!!!!!!!
 			retToken.value = valTemp;
-			
-			printf("retToken.dataType: %c\n", retToken.dataType);
-			printf("retToken.value: %f\n", retToken.value);
-			
-			printf("currentCharPointer: %c\n", *currentCharPointer);
 			
 			free(tempString); ////!!!!
 			
 			return retToken;
 		}
 		default:
-			printf("YOU'VE KILLED ME! AHHHHHHHHhhhhhh...\n"); //hope this never comes up! (spoiler: it did)
+			//hope this next bit never comes up! (spoiler: it did)
+			printf("YOU'VE KILLED ME! AHHHHHHHHhhhhhh...\n"); 
 			printf("There was a bad token in the getNextToken function!\n");
 			printf("Namely: %c\n", c);
-			exit(2);
+			exit(5);
 	}
 }
 
 
+//Returns the next character for consideration in the input string. Also
+//increments the currentCharPointer.
 char getNextChar()
 {
 	char* tmp = currentCharPointer;
-	
-	printf("character that getNextChar is returning: %c\n", *tmp);
-	
 	currentCharPointer++;
 	
 	return *tmp;
 }
 
 
-//need to add ability to set buffer equal to true and set buffer!
+//Decrements the character pointer. Also, places the most recently created token
+//into the temporary buffer and sets isBufferToken to TRUE.
 void goBackOneChar(struct Token tokenToPutBack)
 {
-	printf("Calling goBackOneChar\n");
-	
 	if ( isBufferToken )
 	{
 		printf("ERROR! Token already in the buffer!\n");
 		exit(6);
 	}
+	
 	bufferToken = tokenToPutBack;
 	isBufferToken = TRUE;
 	
-	
-	printf("This is the current character: %c\n", *currentCharPointer);
-	
-	printf("going back one char!\n");
-	//~ currentCharPointer--;
 	rollBackCharacterPointerOnly();
-	
-	printf("This is now the current character: %c\n", *currentCharPointer);
 }
 
 
+//Rolls back the character pointer to the previously considered place.
 void rollBackCharacterPointerOnly()
 {
-	printf("Calling rollBackCharacterPointerOnly\n");
 	currentCharPointer--;
 }
-
