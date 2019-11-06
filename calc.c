@@ -6,7 +6,8 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h> //for using exit()
+#include <stdlib.h> //for using exit(), atof()
+#include <ctype.h> //for isdigit()
 
 #include "calc.h"
 
@@ -101,11 +102,11 @@ int calculator()
 			printf("This is the value of workingArray: %s\n", workingArray);////
 			//Perform calculation!
 			
-			charptr = workingArray;
-			printf("This is the value of charptr: %c\n", *charptr);////
-			printf("This is the value of charptr+1: %c\n", *(charptr+1)  );////
+			currentCharPointer = workingArray;
+			printf("This is the value of charptr: %c\n", *currentCharPointer);////
+			printf("This is the value of charptr+1: %c\n", *(currentCharPointer+1)  );////
 			
-			double answer = plusMinus();
+			double answer = plusMinus(workingArray);///////////////////////////////////////////////////PLUSMINUS
 			printf("= %f\n", answer);
 			
 			
@@ -134,13 +135,18 @@ char askIfContinue(char myChar)
 }
 
 
-//expression in the book
-double plusMinus()
+//expression in the book  /////////////////////////////////////////////////working here.
+double plusMinus(char* workingArray)
 {
 	//~ double leftVal = multiplyDivide(); //may need to pass values or make a global var.
 	
 	//get a token. Will need to have pointer to current char in workArray
-	//~ Token myToken = getToken();
+	struct Token myToken = getNextToken();
+	
+	printf("Value of the returned token:\n");
+	printf("dataType: %c\nValue: %f\n", myToken.dataType, myToken.value);
+	
+	//~ printf("Value returned from getNextChar: %c\n", getNextChar().);
 	
 	
 	return 1.1;
@@ -153,5 +159,103 @@ double multiplyDivide()
 }
 
 
+//Returns the next char to consider. Advances the currentCharPointer by 1.
+struct Token getNextToken()
+{
+	//~ char* tmp = currentCharPointer;
+	
+	//~ currentCharPointer++;
+	//~ return *tmp;
+	
+	//if there is a buffer Token, draw from it instead.
+	if ( isBufferToken )
+	{
+		isBufferToken = FALSE;
+		return bufferToken;
+	}
+	else
+	{
+		char c;
+		c = getNextChar();
+		
+		switch(c)
+		{
+			case ';':
+			case '(':
+			case ')':
+			case '+':
+			case '-':
+			case '*':
+			case '/':
+			{
+				struct Token aToken;
+				aToken.dataType = c;				
+				return aToken; //make a token out of this character.
+			}
+			case '.':  //not expect  decimal for now
+			case '0':
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
+			{
+				goBackOneChar();
+				double valTemp;
+				
+				//get the number including decimal as a string
+				int currentStringSize = 100;
+				char* tempString = (char*) malloc(currentStringSize + 1);
+				char tmpC;
+				while ( isdigit( tmpC = (int)getNextChar() ) || tmpC == '.' )
+				{
+					if( strlen(tempString) + 10 > currentStringSize )
+					{
+						tempString = (char *)realloc(tempString, currentStringSize*2 + 2);
+					}
+					
+					//~ strcat(tempString, (char)tmpC );
+					int tmpLen = strlen(tempString);
+					tempString[ tmpLen ] = tmpC;
+					tempString[ tmpLen + 1] = '\n';
+					
+				}
+				
+				//convert that string to a double!
+				valTemp = atof( tempString );
+				
+				struct Token retToken;
+				retToken.dataType = 'n'; //Using 'n' for number!!!!!!!!
+				retToken.value = valTemp;
+				
+				free(tempString); ////!!!!
+				
+				return retToken;
+			}
+			default:
+				printf("YOU'VE KILLED ME! AHHHHHHHHhhhhhh...\n");
+				exit(2);
+		}
+	}
+	
+}
 
+
+char getNextChar()
+{
+	char* tmp = currentCharPointer;
+	
+	currentCharPointer++;
+	return *tmp;
+}
+
+
+void goBackOneChar()
+{
+	currentCharPointer--;
+}
 
