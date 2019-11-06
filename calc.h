@@ -2,7 +2,6 @@
  * Stephen Stengel <stephen.stengel@cwu.edu> 40819903
  * 
  * Header file for calc.c
- * Might not really be needed.
  * 
  */
 #ifndef CALC_H_LOL
@@ -11,37 +10,31 @@
 #define TRUE 1
 #define FALSE 0
 
+//Operators represent themselves as a character. Numbers represented by 'n'.
+//End of expression character is ';'
 struct Token
 {
 	char dataType;
-	double value; //if a number
+	double value; //Defined if a number. Undefined otherwise.
 };
 
 int helpCheckPrint(int argc, char** argv);
 
-char getNextChar(); //returns a char, advances pointer.
+char getNextChar();
 struct Token getNextToken();
 void goBackOneChar();
-//void putCharBack(); //just un-advance the pointer?
 struct Token bufferToken;
 _Bool isBufferToken = FALSE;
 void rollBackCharacterPointerOnly();
 
+char bufferCharacter;
+char* currentCharPointer;
 
-char bufferCharacter; //nasty global var
-char* currentCharPointer; //current character pointer
-
-
-double numbersAndParentheses(); //primary in book
-double multiplyDivide(); //term in book
-double plusMinus(); //expression in book
+double numbersAndParentheses();
+double multiplyDivide();
+double plusMinus();
 
 int calculator();
 char askIfContinue(char iWillContinue);
-
-
-
-
-
 
 #endif
