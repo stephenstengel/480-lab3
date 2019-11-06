@@ -25,6 +25,8 @@ void goBackOneChar();
 //void putCharBack(); //just un-advance the pointer?
 struct Token bufferToken;
 _Bool isBufferToken = FALSE;
+void rollBackCharacterPointerOnly();
+
 
 char bufferCharacter; //nasty global var
 char* currentCharPointer; //current character pointer
@@ -32,7 +34,7 @@ char* currentCharPointer; //current character pointer
 
 double numbersAndParentheses(); //what inputs for these?
 double multiplyDivide(); //term in book
-double plusMinus(char* workingArray); //expression in book
+double plusMinus(); //expression in book
 
 int calculator();
 char askIfContinue(char iWillContinue);
