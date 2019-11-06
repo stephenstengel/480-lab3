@@ -1,7 +1,7 @@
 Stephen Stengel <stephen.stengel@cwu.edu> 40819903
 
 How to compile this software:
-This will compile on linux. Start by unzipping the contents of the zip folder.
+This will compile on Linux. Start by unzipping the contents of the zip folder.
 Open a console and change the path to the folder in which the source files were
 unzipped. Running the following command will compile the code for you:
 
@@ -10,3 +10,10 @@ unzipped. Running the following command will compile the code for you:
 The calculator can then be run by typing:
 
 	./calc
+
+There is a short help text if you type:
+
+	./calc help
+
+You must enter expressions without spaces.
+Expressions must end with a semicolon ;
