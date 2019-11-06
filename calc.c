@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdlib.h> //for using exit(), atof()
 #include <ctype.h> //for isdigit()
+#include <math.h> //for pow()
 
 #include "calc.h"
 
@@ -140,6 +141,7 @@ char askIfContinue(char myChar)
 //expression in the book  /////////////////////////////////////////////////working here.
 double plusMinus()
 {
+	printf("Calling plusminus\n");
 	double leftVal = multiplyDivide(); //may need to pass values or make a global var.
 	
 	//get a token. Will need to have pointer to current char in workArray
@@ -174,7 +176,15 @@ double plusMinus()
 
 double multiplyDivide()
 {
+	printf("Calling multiplyDivide\n");
 	double leftVal = numbersAndParentheses(); //may need to pass values or make a global var.
+	printf("Back in multiplyDivide\n");
+	
+	printf("*currentCharPointer: %c\n", *currentCharPointer);
+	//~ if ( *currentCharPointer == ';' )
+	//~ {
+		//~ return leftVal;
+	//~ }
 	
 	//get a token. Will need to have pointer to current char in workArray
 	struct Token myToken = getNextToken();
@@ -203,6 +213,10 @@ double multiplyDivide()
 				myToken = getNextToken();
 				break;
 			}
+			case '^':
+				leftVal = pow(leftVal, numbersAndParentheses() );
+				myToken = getNextToken();
+				break;
 			default:
 				goBackOneChar(myToken);
 				return leftVal;
@@ -216,92 +230,15 @@ double multiplyDivide()
 }
 
 
-//Returns the next char to consider. Advances the currentCharPointer by 1.
-struct Token getNextToken()
-{
-	//if there is a buffer Token, draw from it instead.
-	if ( isBufferToken )
-	{
-		isBufferToken = FALSE;
-		return bufferToken;
-	}
-	else
-	{
-		char c;
-		c = getNextChar();
-		
-		switch(c)
-		{
-			case ';':
-			case '(':
-			case ')':
-			case '+':
-			case '-':
-			case '*':
-			case '/':
-			{
-				struct Token aToken;
-				aToken.dataType = c;				
-				return aToken; //make a token out of this character.
-			}
-			case '.':  
-			case '0':
-			case '1':
-			case '2':
-			case '3':
-			case '4':
-			case '5':
-			case '6':
-			case '7':
-			case '8':
-			case '9':
-			{
-				//~ goBackOneChar(myToken); //Here, I need to reverse the digit in consideration by 1
-				rollBackCharacterPointerOnly();
-				double valTemp;
-				
-				//get the number including decimal as a string
-				int currentStringSize = 100;
-				char* tempString = (char*) malloc(currentStringSize + 1);
-				char tmpC;
-				while ( isdigit( tmpC = (int)getNextChar() ) || tmpC == '.' )
-				{
-					if( strlen(tempString) + 10 > currentStringSize )
-					{
-						tempString = (char *)realloc(tempString, currentStringSize*2 + 2);
-					}
-					
-					//~ strcat(tempString, (char)tmpC );
-					int tmpLen = strlen(tempString);
-					tempString[ tmpLen ] = tmpC;
-					tempString[ tmpLen + 1] = '\n';
-					
-				}
-				
-				//convert that string to a double!
-				valTemp = atof( tempString );
-				
-				struct Token retToken;
-				retToken.dataType = 'n'; //Using 'n' for number!!!!!!!!
-				retToken.value = valTemp;
-				
-				free(tempString); ////!!!!
-				
-				return retToken;
-			}
-			default:
-				printf("YOU'VE KILLED ME! AHHHHHHHHhhhhhh...\n"); //hope this never comes up! (spoiler: it will)
-				printf("There was a bad token in the getNextToken function!\n");
-				printf("Namely: %c\n", c);
-				exit(2);
-		}
-	}
-}
 
 
 double numbersAndParentheses()
 {
+	printf("Calling numbersandparentheses\n");
+
 	struct Token myToken = getNextToken();
+	printf("Back in numbersandparentheses\n");
+	
 	
 	switch(myToken.dataType)
 	{
@@ -318,14 +255,123 @@ double numbersAndParentheses()
 			return tempDouble;
 		}
 		case 'n': //n is the character I'm using to represent number tokens
+			printf("Returning from numbersandparentheses this value: %f\n", myToken.value);
 			return myToken.value;
+		case '-':
+			return -numbersAndParentheses(); //handling negatives.
+		case '+':
+			return numbersAndParentheses();
 		default:
 			printf("ERROR! Was expecting a '(' or a number but it was"
 					" something else!\n");
 			exit(5);
 	}
+}
+
+
+//Returns the next char to consider. Advances the currentCharPointer by 1.
+struct Token getNextToken()
+{
+	printf("Calling getNextToken\n");
+
+	//if there is a buffer Token, draw from it instead.
 	
-	//~ return 1.2345;
+	printf("isBufferToken: %d\n", isBufferToken);
+	printf("bufferToken.dataType: %c\n", bufferToken.dataType);
+	printf("bufferToken.value: %f\n", bufferToken.value);
+	if ( isBufferToken )
+	{
+		printf("There is a buffer token. Returning it.\n");
+		
+		isBufferToken = FALSE;
+		return bufferToken;
+	}
+	char c;
+	c = getNextChar();
+	
+	switch(c)
+	{
+		case ';':
+		case '(':
+		case ')':
+		case '+':
+		case '-':
+		case '*':
+		case '/':
+		{
+			struct Token aToken;
+			aToken.dataType = c;				
+			return aToken; //make a token out of this character.
+		}
+		case '.':  
+		case '0':
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		case '8':
+		case '9':
+		{
+			//~ goBackOneChar(); //Here, I need to reverse the digit in consideration by 1
+			rollBackCharacterPointerOnly();
+			double valTemp;
+			
+			//get the number including decimal as a string
+			int currentStringSize = 100;
+			char* tempString = (char*)malloc(currentStringSize + 1);
+			char tmpC;
+			while ( isdigit( tmpC = getNextChar() ) || tmpC == '.' )
+			{
+				printf("While called!\n");
+				if( strlen(tempString) + 10 > currentStringSize )
+				{
+					printf("realloc called lol\n");
+					tempString = (char *)realloc(tempString, currentStringSize*2 + 2);
+				}
+				
+				//~ strcat(tempString, (char)tmpC );
+				int tmpLen = strlen(tempString);
+				printf("tmpLen: %d\n", tmpLen);//////////////////strLen is zero if input is "1;"
+				tempString[ tmpLen ] = tmpC;
+				tempString[ tmpLen + 1] = '\0';
+				
+				printf("tempString length: %d\n", (int)strlen(tempString) );
+				printf("Contents of tempString: %s\n", tempString);
+				
+			}
+			printf("currentCharPointer just after while: %c\n", *currentCharPointer);
+			
+			//~ goBackOneChar();//not sure if need go back just char or also token.
+			//~ rollBackCharacterPointerOnly();
+			printf("currentCharPointer just after goBack: %c\n", *currentCharPointer);
+			
+			
+			//convert that string to a double!
+			valTemp = atof( tempString );
+			printf("value of valTemp: %f\n", valTemp);
+			
+			struct Token retToken;
+			retToken.dataType = 'n'; //Using 'n' for number!!!!!!!!
+			retToken.value = valTemp;
+			
+			printf("retToken.dataType: %c\n", retToken.dataType);
+			printf("retToken.value: %f\n", retToken.value);
+			
+			printf("currentCharPointer: %c\n", *currentCharPointer);
+			
+			free(tempString); ////!!!!
+			
+			return retToken;
+		}
+		default:
+			printf("YOU'VE KILLED ME! AHHHHHHHHhhhhhh...\n"); //hope this never comes up! (spoiler: it did)
+			printf("There was a bad token in the getNextToken function!\n");
+			printf("Namely: %c\n", c);
+			exit(2);
+	}
 }
 
 
@@ -336,7 +382,7 @@ char getNextChar()
 	printf("character that getNextChar is returning: %c\n", *tmp);
 	
 	currentCharPointer++;
-	//~ printf("character that getNextChar is will return next: %c\n", *currentCharPointer);
+	
 	return *tmp;
 }
 
@@ -344,6 +390,8 @@ char getNextChar()
 //need to add ability to set buffer equal to true and set buffer!
 void goBackOneChar(struct Token tokenToPutBack)
 {
+	printf("Calling goBackOneChar\n");
+	
 	if ( isBufferToken )
 	{
 		printf("ERROR! Token already in the buffer!\n");
@@ -365,6 +413,7 @@ void goBackOneChar(struct Token tokenToPutBack)
 
 void rollBackCharacterPointerOnly()
 {
+	printf("Calling rollBackCharacterPointerOnly\n");
 	currentCharPointer--;
 }
 

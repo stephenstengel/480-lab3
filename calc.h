@@ -32,7 +32,7 @@ char bufferCharacter; //nasty global var
 char* currentCharPointer; //current character pointer
 
 
-double numbersAndParentheses(); //what inputs for these?
+double numbersAndParentheses(); //primary in book
 double multiplyDivide(); //term in book
 double plusMinus(); //expression in book
 
