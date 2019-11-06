@@ -3,11 +3,11 @@
 
 #Makes the executable
 calc: calc.o
-	gcc -Wall -o calc calc.o
+	gcc -Wall -o calc calc.o -lm
 
 #Makes object file
 calc.o: calc.c calc.h
-	gcc -Wall -c calc.c
+	gcc -Wall -c calc.c -lm
 
 
 #Miscellaneous
