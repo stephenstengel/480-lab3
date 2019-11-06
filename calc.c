@@ -101,6 +101,10 @@ int calculator()
 			printf("This is the value of workingArray: %s\n", workingArray);////
 			//Perform calculation!
 			
+			charptr = workingArray;
+			printf("This is the value of charptr: %c\n", *charptr);////
+			printf("This is the value of charptr+1: %c\n", *(charptr+1)  );////
+			
 			double answer = plusMinus();
 			printf("= %f\n", answer);
 			
@@ -133,5 +137,21 @@ char askIfContinue(char myChar)
 //expression in the book
 double plusMinus()
 {
+	//~ double leftVal = multiplyDivide(); //may need to pass values or make a global var.
+	
+	//get a token. Will need to have pointer to current char in workArray
+	//~ Token myToken = getToken();
+	
+	
 	return 1.1;
 }
+
+
+double multiplyDivide()
+{
+	return 1.1;
+}
+
+
+
+

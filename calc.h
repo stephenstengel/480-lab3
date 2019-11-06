@@ -14,11 +14,14 @@ char getNextChar(); //returns a char, advances pointer.
 void putCharBack(); //just un-advance the pointer?
 
 double numbersAndParentheses(); //what inputs for these?
-double multiplyDivide();
-double plusMinus();
+double multiplyDivide(); //term in book
+double plusMinus(); //expression in book
 
 int calculator();
 char askIfContinue(char iWillContinue);
+
+
+char* charptr; //current character pointer
 
 struct Token
 {
