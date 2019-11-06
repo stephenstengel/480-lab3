@@ -32,18 +32,11 @@ int main(int argc, char **argv)
 	helpCheckPrint(argc, argv);
 	printf("Yeah, heres my calculator!\n");
 
-	int calcFlag = calculator();
-
-	printf("The status code of calculate was: %d: \n", calcFlag);
+	//~ int calcFlag = calculator();
 	
-	struct Token myToken;
-	myToken.dataType = 'n';
-	myToken.value = 200.1;
-	printf( "Value of myToken.dataType: %c  Value of myToken.value: %f\n",
-			myToken.dataType,
-			myToken.value );
-		
+	calculator();
 
+	//~ printf("The status code of calculate was: %d: \n", calcFlag);
 	
 	return 0;
 }
@@ -62,8 +55,9 @@ int helpCheckPrint(int argc, char** argv)
 		printf("You may then enter an arithmatic expression consisting\n"
 				"of real numbers, and the operators: +, -, *, /, and ^.\n"
 				"You may also use parentheses ().\n");
+		printf("THE EXPRESSION MUST END WITH A SEMICOLON! ;\n");
 		printf("\nExample:\n");
-		printf("Entering:\n    2+3*(-4^2)\n");
+		printf("Entering:\n    2+3*(-4^2);\n");
 		printf("after the prompt and pressing enter will cause the "
 				"calculator to output:\n");
 		printf("    = 50");
@@ -298,6 +292,7 @@ struct Token getNextToken()
 		case '-':
 		case '*':
 		case '/':
+		case '^':
 		{
 			struct Token aToken;
 			aToken.dataType = c;				
@@ -345,7 +340,7 @@ struct Token getNextToken()
 			printf("currentCharPointer just after while: %c\n", *currentCharPointer);
 			
 			//~ goBackOneChar();//not sure if need go back just char or also token.
-			//~ rollBackCharacterPointerOnly();
+			rollBackCharacterPointerOnly();
 			printf("currentCharPointer just after goBack: %c\n", *currentCharPointer);
 			
 			
