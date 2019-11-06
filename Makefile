@@ -25,4 +25,5 @@ backup:
 #Makes a zip of the project files.
 .PHONY: zip
 zip:
-	7z a source_stengel_stephen.zip calc calc.h calc.c Makefile HowTo.txt
+	7z a source_stengel_stephen.zip calc calc.h calc.c Makefile HowTo.txt \
+			version_control_stengel_stephen.pdf gantt.pdf
