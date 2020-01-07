@@ -1,0 +1,22 @@
+This is a calculator program that takes algebraic input. It is not
+very well written; I wrote it in a few hours before it was due! It
+contains a fair ammount of spaghetti code! It works by using a method
+that I found in the C++ programming book by Stroustrup. This version
+is written in C and requires linux-- for example, on line 71 of calc.c,
+it uses a special flag in the scanf call, "m", which only works on linux
+(and some other posix unix thingies).
+
+scanf("%ms", &workingArray); This allocates memory for an input string
+automatically so you don't need to mess with malloc.
+
+The calculator splits an input into different types of sub-inputs
+recursively. I think the book called this lexographic or something like
+that. It recurses down until it can do evaluation of expressions and
+then goes back up to eventually return an answer.
+
+A simpler way that everyone else used was by just taking an input
+string and converting it into reverse polish notation and executing
+the operations with a stack. Technically this does the same thing but
+with recursion.
+
+Stephen Stengel <stephen.stengel@cwu.edu>
