@@ -1,10 +1,10 @@
-This is a calculator program that takes algebraic input. It is not
-very well written; I wrote it in a few hours before it was due! It
-contains a fair ammount of spaghetti code! It works by using a method
-that I found in the C++ programming book by Stroustrup. This version
-is written in C and requires linux-- for example, on line 71 of calc.c,
-it uses a special flag in the scanf call, "m", which only works on linux
-(and some other posix unix thingies).
+This is a calculator program that takes algebraic input. It is not very
+well written and it doesn't always work; I wrote it in a few hours
+before it was due! It contains a fair ammount of spaghetti code! It
+works by using a method that I found in the C++ programming book
+by Stroustrup. This version is written in C and requires linux-- for
+example, on line 71 of calc.c, it uses a special flag in the scanf call,
+"m", which only works on linux (and some other posix unix thingies).
 
 scanf("%ms", &workingArray); This allocates memory for an input string
 automatically so you don't need to mess with malloc.
